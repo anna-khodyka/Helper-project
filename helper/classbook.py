@@ -3,6 +3,7 @@ import re
 from collections import UserList
 from datetime import datetime
 
+
 class Field:
     def __init__(self, value):
         self.__value = value
@@ -65,22 +66,28 @@ class AddressBook(UserList):
             result = result.rstrip("\n")
             yield result
 
-#START OF CHANGING
+# START OF CHANGING
+
+
 class Address(Field):
     def __init__(self, address):
         self.address = address
+
 
 class Tags(Field):
     def __init__(self, tags):
         self.tags = tags
 
+
 class Id(Field):
     def __init__(self, id_n):
         self.id_n = id_n
 
+
 class Email(Field):
     def __init__(self, email):
-        self.email=email
+        self.email = email
+
 
 class Birthday(Field):
     def __init__(self, value):
@@ -97,24 +104,23 @@ class Birthday(Field):
             self.__birthday = datetime.strptime(birthday, '%d.%m.%Y')
         except Exception:
             print("Incorrect format, expected day.month.year (Example:25.12.1970)")
-    
+
 
 class Record:
-    def __init__(self, name, id_n, phones=None, birthday=None, address=None, email=None, tags=None ):
+    def __init__(self, name, id_n, phones=None, birthday=None, address=None, email=None, tags=None):
         self.id_n = id_n
         self.phones = []
         self.birthday = None
-        self.address=None
-        self.email=None
-        self.tags=None
+        self.address = None
+        self.email = None
+        self.tags = None
         self.user = {'Id': self.id_n, 'Name': name.name,
-                     'Phones': self.phones, 
-                     'Birthday': self.birthday, 
-                     'Address':self.address, 
-                     'E-mail':self.email, 
-                     'Tags':self.tags}
-#Start to add
-
+                     'Phones': self.phones,
+                     'Birthday': self.birthday,
+                     'Address': self.address,
+                     'E-mail': self.email,
+                     'Tags': self.tags}
+# Start to add
 
     def add_address(self, address):
         self.address = address
@@ -124,8 +130,8 @@ class Record:
 
     def add_id(self, id_n):
         self.id_n = id_n
-    
-    #End       
+
+    # End
     def add_phone(self, phone):
         phone = str(phone)
         try:
@@ -134,8 +140,6 @@ class Record:
                 self.phones.append(phone)
         except:
             print('Phone must start with + and have 12 digits. Example +380501234567 ADD')
-
-    
 
     def remove_phone(self, phone):
         for i in range(len(self.phones)):
@@ -171,7 +175,5 @@ class Phone(Field):
             print(
                 'Phone must start with + and have 12 digits. Example +380501234567')
 
-    # def __str__(self):
-        # return self.phone
     def __repr__(self):
         return self.phone

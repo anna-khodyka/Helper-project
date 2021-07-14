@@ -3,7 +3,7 @@ from collections import UserList
 
 class NotesBook(UserList):
     # список списков: список заметок, каждая заметка - список с 2 элементов:
-    # заметка[0]-множество тєгов, заметка[1] - текст заметки
+    # заметка[0]-строка с тєгами, заметка[1] - текст заметки
 
     def add_note(self, text, hashtag):
         # добавляет заметку в NotesBook
@@ -17,7 +17,7 @@ class NotesBook(UserList):
                 self.remove(note)
 
     def edit_note(self, hashtag):
-        # удаляет заметку из NotesBook, которая имеет заметка[0]==hashtag
+        # редактирует заметку из NotesBook, которая имеет заметка[0]==hashtag
         # редактирование заметки происходит построчно
         # помощник печатает строку для редактирование,
         # далее пользователь вводит строку, на которую надо заменить напечатанную строку.
@@ -41,8 +41,6 @@ class NotesBook(UserList):
                     counter += 1
                 note[1] = '\n'.join(lines)
                 print("The note is edited")
-        else:
-            print("Not found this Tag")
 
     def find_note(self, keyword):
         # находит все заметки, в тэгах которых содержится keyword
@@ -75,8 +73,6 @@ class NotesBook(UserList):
 
     def __str__(self):
         result = ""
-        # for note in self:
-        #     result += note[0]+"\n" + note[1]+"\n"
 
         # Печать шапки с названием столбцов
         result += f" {72*'_'} \n"
@@ -94,22 +90,3 @@ class NotesBook(UserList):
                 counter += 1
             result += f'|{30*"_"}|{40*"_"}|\n'
         return result
-
-
-def notes_main():
-    # техническая функция для проверки работы модуля, можно удалить
-    global notes_book
-    notes_book = NotesBook()
-
-    # print(add_note())
-    # print(add_note())
-    # print(find_note())
-    # print(sort_notes())
-    # print(delete_note())
-
-    # print(edit_note())
-    # print(show_notes())
-
-
-if __name__ == '__main__':
-    notes_main()
