@@ -15,6 +15,9 @@ class ViewInterface:
 
 
 class ConsoleView(ViewInterface):
+    def __init__(self):
+        super().__init__()
+        self.esc_e = True
 
     def greete(self):
         print(100*'_')
@@ -42,8 +45,11 @@ class ConsoleView(ViewInterface):
             '   What do you want to do?\n   Type exact command you want to do, \n   "help" for list of commands.\n   "exit" to exit\n')
         return user_inpu.lower()
 
+    def say_buy(self):
+        print('The Helper is closing... Buy-buy')
+
     def notify_of_error(self):
-        return 'Wrong input! Type exact command you want to do,"exit" to exit or "help" for list of commands.'
+        print('Wrong input! Type exact command you want to do,"exit" to exit or "help" for list of commands.')
 
     def notify_of_message(self, message):
         print(message)
@@ -121,3 +127,69 @@ class ConsoleView(ViewInterface):
             return True
         else:
             return False
+
+    def enter_number_of_page(self):
+        number = input('Please input the number of record on 1 page: ')
+        try:
+            number = int(number)
+        except:
+            number = 10
+        print("The contacts book is following:")
+        if number == 0 or number == None:
+            number = 10
+        return number
+
+    def show_one_page_of_addressbook(self, i):
+        print(145*'_')
+        print('| ID  |           Name           |     Phones      |  Birthday  |           Address            |              E-mail            |      Tags      |')
+        print(145*'-')
+        print(i)
+        print(63*'_'+'The end of the page. PRESS ENTER'+63*'_')
+        input()
+
+    def enter_path_for_clean_lolder(self):
+        print(100*"_")
+        print('Welcome to clean folder instrument!')
+        print(100*"_")
+        print('Please enter path to clean and structurise.')
+        return str(input())
+    ##########Функции for Controller - Add #################
+
+    def ask_to_add_field(self, field_name):
+        print(
+            f'Do you want to add {field_name.upper()} "y" (YES) or "n" (NO). Type "exit" to exit')
+        decision = str(input())
+        decision = decision.lower()
+        return decision
+
+    def input_name(self):
+        print('Input Name:')
+        return str(input())
+
+    def input_phone(self):
+        print('Input Phone Number. Example: +380501234567')
+        return str(input())
+
+    def input_birthday(self):
+        print('Input Birthday. Expected day.month.year(Example:25.12.1970). If year of birth is not known, type 1111')
+        return str(input())
+
+    def input_address(self):
+        print('Input Address. Please no more than 30 symbols')
+        return str(input())
+
+    def input_email(self):
+        print('Input E-mail. Please no more than 30 symbols')
+        return str(input())
+
+    def input_tags(self):
+        print('Input Tags. Please no more than 15 symbols')
+        return str(input())
+
+    def input_birthday_search_type(self):
+        print("1.   If you want to find, who'll have birthday in exact date TYPE 1.\n2.   If you need to know who'll have birthday in period of time TYPE 2.\n3.   If you need to know how many days to somebody's birthday TYPE 3.\n4.   Type 'exit' to exit")
+        return int(input())
+
+    def input_for_birthday_1(self):
+        print("Please write in how many days will be people's birthday.")
+        return int(input())

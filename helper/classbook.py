@@ -1,13 +1,12 @@
 import re
 
 from collections import UserList
-from datetime import datetime
+from datetime import datetime, timedelta, date
 
 
 class Field:
     def __init__(self, value):
         self.__value = value
-        # self.value=value
 
     @property
     def value(self):
@@ -46,7 +45,7 @@ class AddressBook(UserList):
                                 break
         return result
 
-    def iterator1(self, n):
+    def iterator(self, n):
         counter = 0
         result = ""
         for i in self:
@@ -66,7 +65,22 @@ class AddressBook(UserList):
             result = result.rstrip("\n")
             yield result
 
-# START OF CHANGING
+    def find_persons_with_birthday_in_n_days(self, n, book):
+
+        if n >= 365:
+            n = n % 365
+
+        birthday_book = AddressBook()
+
+        today_d = datetime.now().date()
+        d = timedelta(days=n)
+        bday = today_d+d
+        bday = bday.strftime("%d.%m.%Y")
+        for i in book:
+            if i["Birthday"] != 0 and i["Birthday"] != None:
+                if Birthday.days_to_birthday(i["Birthday"]) == n:
+                    birthday_book.append(i)
+        return bday, birthday_book
 
 
 class Address(Field):
@@ -91,19 +105,35 @@ class Email(Field):
 
 class Birthday(Field):
     def __init__(self, value):
-        self.__birthday = None
+        # self.__birthday = None
         self.birthday = value
 
-    @ property
-    def birthday(self):
-        return self.__birthday.strftime('%d.%m.%Y')
+    # @property
+    # def birthday(self):
+    #     return self.__birthday.strftime('%d.%m.%Y')
 
-    @ birthday.setter
-    def birthday(self, birthday):
-        try:
-            self.__birthday = datetime.strptime(birthday, '%d.%m.%Y')
-        except Exception:
-            print("Incorrect format, expected day.month.year (Example:25.12.1970)")
+    # @birthday.setter
+    # def birthday(self, birthday):
+    #     try:
+    #         self.__birthday = datetime.strptime(birthday, '%d.%m.%Y')
+    #     except Exception:
+    #         print("Incorrect format, expected day.month.year (Example:25.12.1970)")
+
+    @staticmethod
+    def days_to_birthday(bday):
+        print('I am in days_to_birthday function')
+        today_d = datetime.now().date()
+        print(f'today_d {today_d}')
+        # bday = datetime.strptime(bday, "%d.%m.%Y").date()
+        bday = date(today_d.year, bday.month, bday.day)
+
+        if today_d > bday:
+            bday = date(today_d.year+1, bday.month, bday.day)
+            days_left = (bday-today_d)
+        else:
+            days_left = (bday-today_d)
+        print(f'days_left {days_left}')
+        return days_left.days
 
 
 class Record:
@@ -120,10 +150,12 @@ class Record:
                      'Address': self.address,
                      'E-mail': self.email,
                      'Tags': self.tags}
-# Start to add
 
     def add_address(self, address):
         self.address = address
+
+    def add_birthday(self, birthday):
+        self.bithday = birthday
 
     def add_email(self, email):
         self.email = email
@@ -131,7 +163,6 @@ class Record:
     def add_id(self, id_n):
         self.id_n = id_n
 
-    # End
     def add_phone(self, phone):
         phone = str(phone)
         try:
@@ -149,6 +180,28 @@ class Record:
     def edit_phone(self, phone, new_phone):
         self.remove_phone(phone)
         self.add_phone(new_phone)
+
+    def validate_phone(self, phone):
+        return re.fullmatch('[+]?[0-9]{3,12}', phone)
+
+    def validate_address(self, address):
+        return len(address) > 1 and len(address) <= 30
+
+    def validate_tags(self, tags):
+        return len(tags) > 1 and len(tags) <= 15
+
+    def validate_email_format(self, email):
+        return re.match('([a-zA-Z][a-zA-Z0-9\._!#$%^*=\-]{1,}@[a-zA-Z]+\.[a-zA-Z]{2,})', email)
+
+    def validate_email_duration(self, email):
+        return (len(email) > 1 and len(email) <= 30)
+
+    def validate_birthday(self, birthday):
+        try:
+            datetime.strptime(birthday, "%d.%m.%Y").date()
+            return True
+        except:
+            return False
 
 
 class Name(Field):

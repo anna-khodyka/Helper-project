@@ -36,22 +36,20 @@ class Model:
 def error_handler(func):
     def inner(*args):
         try:
-            result = func(*args)
-            return result
+            return func(*args)
         except:
-            result = view.notify_of_error()
-            return result
+            return view.notify_of_error()
+
     return inner
 
 
 # @error_handler
 def main():  # main относится к контроллеру!
-    global path, book, notes_book, view, model, esc_e
-    esc_e = True
+    global view, model
     view = ConsoleView()
 
+    view.greete()
     while True:
-        view.greete()
         command = view.register_or_authorize()
 
         for key in AUTHORIZATION_COMMANDS:
@@ -73,12 +71,12 @@ def main():  # main относится к контроллеру!
             break
 
         elif command == 'exit':
-            esc_e = False
+            view.esc_e = False
             break
         else:
             view.notify_of_error()
 
-    while esc_e:
+    while view.esc_e:
         user_inpu = view.choose_command()
         result = handler(user_inpu)
         if result:
@@ -89,401 +87,395 @@ def main():  # main относится к контроллеру!
             break
 
 
-@error_handler
+# @error_handler
 def add():
-    print(100*'_')
-    say = 'Successfully changed'
-    global esc_e, book
-    print('Input Name:')
-    name = Name(str(input()))
-
-    if name == 'exit' or name == 'esc' or name == 'close' or name == 'учше':
-        esc_e = False
-        return "Not saved"
-    if len(book) > 0 and len(book) <= 25:
-        id_n = book[-1]["Id"]+1
+    # Ввод имени
+    view.notify_of_message(100*'_')
+    name = Name(view.input_name())
+    if name in EXIT_DECISION:
+        view.esc_e = False
+        view.notify_of_message("Not saved")
+        return None
+    # определение ID
+    if len(model.book) > 0:
+        id_n = model.book[-1]["Id"]+1
     else:
         id_n = 1
     record1 = Record(name, id_n)
 
     while True:
-        print('Do you want to add phone-number? "y" (YES) or "n" (NO). Type "exit" to exit')
-        decision = str(input())
-        decision = decision.lower()
-        if decision == 'y' or decision == 'yes' or decision == 'нуі' or decision == 'н' or decision == 'да' or decision == 'д':
-            print('Input Phone Number. Example: +380501234567')
-            phone = str(input())
-            if re.fullmatch('[+]?[0-9]{3,12}', phone):
+        # ввод телефона
+        decision = view.ask_to_add_field('phone-number')
+
+        if decision in YES_DECISION:
+            phone = view.input_phone()
+            # валидация телефона
+            if record1.validate_phone(phone):
                 record1.add_phone(phone)
             else:
-                print(
+                view.notify_of_message(
                     'Wrong input! Phone may start with + and has from 3 to 12 digits max. Example +380501234567')
 
-        elif decision == 'exit' or decision == 'esc' or decision == 'close' or decision == 'учше':
-            esc_e = False
-            return 'Closed'
-        elif decision == 'n' or decision == 'not' or decision == 'no' or decision == 'нет' or decision == 'тщ' or decision == 'тще' or decision == 'т':
+        elif decision in EXIT_DECISION:
+            model.book.add_record(record1.user)
+            view.esc_e = False
+            view.say_buy()
+            return None
+        elif decision in NO_DECISION:
             break
         else:
-            print('Wrong input!')
+            view.notify_of_message('Wrong input!')
 
     while True:
-        print('Do you want to add Birthday? "y" (YES) or n (NO). Type "exit" to exit')
-        birthday_d = None
-        decision = str(input())
-        decision = decision.lower()
-        if decision == 'y' or decision == 'yes' or decision == 'нуі' or decision == 'н' or decision == 'да' or decision == 'д':
-            print('Input Birthday. Expected day.month.year(Example:25.12.1970). If year of birth is not known, type 1111')
-            birthday = str(input())
-            try:
-                birthday_d = datetime.strptime(birthday, "%d.%m.%Y").date()
-                record1.user['Birthday'] = birthday
+        # ввод дня рождения
+        decision = view.ask_to_add_field('Birthday')
+
+        if decision in YES_DECISION:
+
+            birthday = view.input_birthday()
+            if record1.validate_birthday(birthday):
+                record1.add_birthday(datetime.strptime(
+                    birthday, "%d.%m.%Y").date())
                 break
-            except:
-                print(
+            else:
+                view.notify_of_message(
                     'Wrong Birthday. Expected day.month.year. Format: dd.mm.yyyy (Example:25.12.1970)')
 
-        elif decision == 'exit' or decision == 'esc' or decision == 'close' or decision == 'учше':
-            book.add_record(record1.user)
-            esc_e = False
-            return 'Closed'
+        elif decision in EXIT_DECISION:
+            model.book.add_record(record1.user)
+            view.esc_e = False
+            view.say_buy()
+            return None
 
-        elif decision == 'n' or decision == 'not' or decision == 'no' or decision == 'нет' or decision == 'тщ' or decision == 'тще' or decision == 'т':
+        elif decision in NO_DECISION:
             break
 
         else:
-            print('Wrong input!')
+            view.notify_of_message('Wrong input!')
 
     while True:
-        print('Do you want to add Address? "y" (YES) or n (NO). Type "exit" to exit')
-        decision = str(input())
-        decision = decision.lower()
-        if decision == 'y' or decision == 'yes' or decision == 'нуі' or decision == 'н' or decision == 'да' or decision == 'д':
-            print('Input Address. Please no more than 30 symbols')
-            address = str(input())
-            if len(address) > 1 and len(address) <= 30:
+        # ввод адреса
+        decision = view.ask_to_add_field('address')
+
+        if decision in YES_DECISION:
+            address = view.input_address()
+            # валидация адреса
+            if record1.validate_address(address):
                 record1.user['Address'] = address
                 break
             else:
-                print(
+                view.notify_of_message(
                     f'Your Address is {len(address)} symbols. Please no more than 30 symbols')
-        elif decision == 'exit' or decision == 'esc' or decision == 'close' or decision == 'учше':
-            book.add_record(record1.user)
-            esc_e = False
-            return 'Closed'
+        elif decision in EXIT_DECISION:
+            model.book.add_record(record1.user)
+            view.esc_e = False
+            view.say_buy()
+            return None
 
-        elif decision == 'n' or decision == 'not' or decision == 'no' or decision == 'нет' or decision == 'тщ' or decision == 'тще' or decision == 'т':
+        elif decision in NO_DECISION:
             break
         else:
-            print('Wrong input!')
+            view.notify_of_message('Wrong input!')
 
-    # START HERE
     while True:
-        print('Do you want to add E-mail? "y" (YES) or n (NO). Type "exit" to exit')
-        decision = str(input())
-        decision = decision.lower()
-        if decision == 'y' or decision == 'yes' or decision == 'нуі' or decision == 'н' or decision == 'да' or decision == 'д':
-            print('Input E-mail. Please no more than 30 symbols')
-            email = str(input())
-            if re.match('([a-zA-Z][a-zA-Z0-9\._!#$%^*=\-]{1,}@[a-zA-Z]+\.[a-zA-Z]{2,})', email):
-                if len(email) > 1 and len(email) <= 30:
+        # ввод ємейла
+        decision = view.ask_to_add_field('e-mail')
+
+        if decision in YES_DECISION:
+            email = view.input_email()
+            # валидация ємейла
+            if record1.validate_email_format(email):
+                if record1.validate_email_duration(email):
                     record1.user['E-mail'] = email
                     break
                 else:
-                    print(
+                    view.notify_of_message(
                         f'Your E-mail is {len(email)} symbols. Please no more than 30 symbols')
             else:
-                print(
+                view.notify_of_message(
                     'Format is wrong. Try again in format: your_nickname@something.domen_name')
 
-        elif decision == 'exit' or decision == 'esc' or decision == 'close' or decision == 'учше':
-            book.add_record(record1.user)
-            esc_e = False
-            return 'Closed'
+        elif decision in EXIT_DECISION:
+            model.book.add_record(record1.user)
+            view.esc_e = False
+            view.say_buy()
+            return None
 
-        elif decision == 'n' or decision == 'not' or decision == 'no' or decision == 'нет' or decision == 'тщ' or decision == 'тще' or decision == 'т':
+        elif decision in NO_DECISION:
             break
 
         else:
-            print('Wrong input!')
+            view.notify_of_message('Wrong input!')
 
     while True:
-        print('Do you want to add Tags? "y" (YES) or n (NO). Type "exit" to exit')
-        decision = str(input())
-        decision = decision.lower()
-        if decision == 'y' or decision == 'yes' or decision == 'нуі' or decision == 'н' or decision == 'да' or decision == 'д':
-            print('Input Tags. Please no more than 15 symbols')
-            tags = str(input())
-            if len(tags) > 1 and len(tags) <= 15:
+        # ввод ТЄГА
+        decision = view.ask_to_add_field('tags')
+        if decision in YES_DECISION:
+            tags = view.input_tags()
+            # валидация тегов
+            if record1.validate_tags(tags):
                 record1.user['Tags'] = tags
-                book.add_record(record1.user)
-                save()
-                return say
             else:
-                print(
+                view.notify_of_message(
                     f'Your Tags is {len(tags)} symbols. Please no more than 15 symbols')
 
-        elif decision == 'exit' or decision == 'esc' or decision == 'close' or decision == 'учше':
-            book.add_record(record1.user)
-            esc_e = False
-            return 'Closed'
+        elif decision in EXIT_DECISION:
+            model.book.add_record(record1.user)
+            view.esc_e = False
+            view.say_buy()
+            return None
 
-        elif decision == 'n' or decision == 'not' or decision == 'no' or decision == 'нет' or decision == 'тщ' or decision == 'тще' or decision == 'т':
-            book.add_record(record1.user)
-            save()
-            return say
+        elif decision in NO_DECISION:
+            break
         else:
-            print('Wrong input!')
+            view.notify_of_message('Wrong input!')
+
+    model.book.add_record(record1.user)
+    save()
+    return None
+
+# @error_handler
 
 
-@error_handler
 def change():
-    print(100*"_")
-    global book, esc_e
-    say = 'Successfully changed'
-    print('Type name of record you want to change')
-    old_name = str(input())
-    old_name = old_name.lower()
-    result = book.find_value(old_name)
+    pass
+    # для дальнейшего рефакторинга#####################
 
-    if len(result) > 0 and len(result) != None:
-        show_find(result)
+    # print(100*"_")
+    # say = 'Successfully changed'
+    # print('Type name of record you want to change')
+    # old_name = str(input())
+    # old_name = old_name.lower()
+    # result = model.book.find_value(old_name)
 
-        print(100*"_")
-        print('1.   To change Name: type "name".\n2.   To change Phone: type "phone".\n3.   To change Birthday: type "birthday".\n4.   To change Address: type "address".\n5.   To change E-mail: type "email".\n6.   To change Tags: type "tags"\n7.   To exit: type "exit".\n')
-        decision = str(input())
-        decision = decision.lower()
+    # if len(result) > 0 and len(result) != None:
+    #     show_find(result)
 
-        if decision == 'name' or decision == 'тфьу' or decision == '1':
-            print('Type new name')
-            new_name = str(input())
+    #     print(100*"_")
+    #     print('1.   To change Name: type "name".\n2.   To change Phone: type "phone".\n3.   To change Birthday: type "birthday".\n4.   To change Address: type "address".\n5.   To change E-mail: type "email".\n6.   To change Tags: type "tags"\n7.   To exit: type "exit".\n')
+    #     decision = str(input())
+    #     decision = decision.lower()
 
-            if len(result) > 1:
-                print(f"I've found {len(result)} notes with this Name")
-                show_find(result)
-                print('Please enter Id to change the right name')
+    #     if decision == 'name' or decision == 'тфьу' or decision == '1':
+    #         print('Type new name')
+    #         new_name = str(input())
 
-                del_input = int(input())
-                for i in result:
-                    if i["Id"] == del_input:
-                        i['Name'] = new_name
-                        save()
-                        return say
+    #         if len(result) > 1:
+    #             print(f"I've found {len(result)} notes with this Name")
+    #             show_find(result)
+    #             print('Please enter Id to change the right name')
 
-            elif len(result) == 1:
-                for i in result:
-                    i['Name'] = new_name
-                    save()
-                    return say
+    #             del_input = int(input())
+    #             for i in result:
+    #                 if i["Id"] == del_input:
+    #                     i['Name'] = new_name
+    #                     save()
+    #                     return say
 
-            else:
-                print(f'{old_name} not in Adress Book')
+    #         elif len(result) == 1:
+    #             for i in result:
+    #                 i['Name'] = new_name
+    #                 save()
+    #                 return say
 
-        elif decision == 'phone' or decision == 'зрщту' or decision == '2':
-            print(
-                'Type phone you want to change.If there are no phones - just press "enter".')
+    #         else:
+    #             print(f'{old_name} not in Adress Book')
 
-            if len(result) > 1:
-                print(f"I've found {len(result)} notes with this Name")
-                show_find(result)
-                print('Please enter Id to change the phone of proper name')
-                del_input = int(input())
-                for i in result:
-                    if i["Id"] == del_input:
-                        old_name = str(input())
-                        print('Type new phone')
-                        new_name = str(input())
-                        for i in result:
-                            if len(i['Phones']) > 1:
-                                for j in i['Phones']:
-                                    if j == old_name:
-                                        i['Phones'].remove(j)
-                                        i['Phones'].append(new_name)
-                                        save()
-                                        return say
-                                    else:
-                                        print(f'{old_name} not in Adress Book')
+    #     elif decision == 'phone' or decision == 'зрщту' or decision == '2':
+    #         print(
+    #             'Type phone you want to change.If there are no phones - just press "enter".')
 
-                            elif len(i['Phones']) == 1:
-                                i['Phones'].remove(old_name)
-                                i['Phones'].append(new_name)
-                                return say
-                            elif len(i['Phones']) == 0:
-                                i['Phones'].append(new_name)
-                                save()
-                                return say
+    #         if len(result) > 1:
+    #             print(f"I've found {len(result)} notes with this Name")
+    #             show_find(result)
+    #             print('Please enter Id to change the phone of proper name')
+    #             del_input = int(input())
+    #             for i in result:
+    #                 if i["Id"] == del_input:
+    #                     old_name = str(input())
+    #                     print('Type new phone')
+    #                     new_name = str(input())
+    #                     for i in result:
+    #                         if len(i['Phones']) > 1:
+    #                             for j in i['Phones']:
+    #                                 if j == old_name:
+    #                                     i['Phones'].remove(j)
+    #                                     i['Phones'].append(new_name)
+    #                                     save()
+    #                                     return say
+    #                                 else:
+    #                                     print(f'{old_name} not in Adress Book')
 
-            elif len(result) == 1:
-                old_name = str(input())
-                print('Type new phone')
-                new_name = str(input())
-                for i in result:
-                    if len(i['Phones']) > 1:
-                        for j in i['Phones']:
-                            if j == old_name:
-                                i['Phones'].remove(j)
-                                i['Phones'].append(new_name)
-                                save()
-                                return say
-                        else:
-                            print(f'{old_name} not in Adress Book')
+    #                         elif len(i['Phones']) == 1:
+    #                             i['Phones'].remove(old_name)
+    #                             i['Phones'].append(new_name)
+    #                             return say
+    #                         elif len(i['Phones']) == 0:
+    #                             i['Phones'].append(new_name)
+    #                             save()
+    #                             return say
 
-                    elif len(i['Phones']) == 1:
-                        i['Phones'].remove(old_name)
-                        i['Phones'].append(new_name)
-                        return say
-                    elif len(i['Phones']) == 0:
-                        i['Phones'].append(new_name)
-                        save()
-                        return say
-            else:
-                print(f'{old_name} not in Adress Book')
+    #         elif len(result) == 1:
+    #             old_name = str(input())
+    #             print('Type new phone')
+    #             new_name = str(input())
+    #             for i in result:
+    #                 if len(i['Phones']) > 1:
+    #                     for j in i['Phones']:
+    #                         if j == old_name:
+    #                             i['Phones'].remove(j)
+    #                             i['Phones'].append(new_name)
+    #                             save()
+    #                             return say
+    #                     else:
+    #                         print(f'{old_name} not in Adress Book')
 
-        elif decision == 'birthday' or decision == 'ишкервфн' or decision == '3':
-            print('Type birthday you want to change. Expected day.month.year(Example:25.12.1970). If there is no birthday - just press "enter".')
-            if len(result) > 1:
-                print(f"I've found {len(result)} notes with this Name")
-                show_find(result)
-                print('Please enter Id to change birthday of proper name')
-                del_input = int(input())
-                for i in result:
-                    if i["Id"] == del_input:
-                        old_name = str(input())
-                        print(
-                            'Type new birthday. Expected day.month.year(Example:25.12.1970). If year of birth is not known, type 1111')
-                        new_name = str(input())
-                        try:
-                            new_name = datetime.strptime(
-                                new_name, "%d.%m.%Y").date()
-                        except:
-                            print(
-                                'Wrong input. Expected day.month.year(Example:25.12.1970)')
-                        for i in result:
-                            if i['Birthday'] == old_name:
-                                i['Birthday'] = new_name
-                                save()
-                                return say
-                            elif i['Birthday'] == None:
-                                i['Birthday'] = new_name
-                                save()
-                                return say
-                            else:
-                                print(f'{old_name} not in Adress Book')
-            elif len(result) == 1:
-                old_name = str(input())
-                print('Type new birthday. Expected day.month.year(Example:25.12.1970)')
-                new_name = str(input())
-                try:
-                    new_name = datetime.strptime(new_name, "%d.%m.%Y").date()
-                except:
-                    print('Wrong input. Expected day.month.year(Example:25.12.1970)')
-                for i in result:
-                    if i['Birthday'] == old_name:
-                        i['Birthday'] = new_name
-                        save()
-                        return say
-                    elif i['Birthday'] == None:
-                        i['Birthday'] = new_name
-                        save()
-                        return say
-                    else:
-                        print(f'{old_name} not in Adress Book')
+    #                 elif len(i['Phones']) == 1:
+    #                     i['Phones'].remove(old_name)
+    #                     i['Phones'].append(new_name)
+    #                     return say
+    #                 elif len(i['Phones']) == 0:
+    #                     i['Phones'].append(new_name)
+    #                     save()
+    #                     return say
+    #         else:
+    #             print(f'{old_name} not in Adress Book')
 
-        elif decision == 'address' or decision == 'adress' or decision == 'adres' or decision == 'фввкуіі' or decision == 'фвкуі' or decision == '4':
-            print(
-                'Type address you want to change. If there is no address - just press "enter".')
-            old_name = str(input())
-            print('Type new address.')
-            new_name = str(input())
-            for i in result:
-                if i['Address'] == old_name:
-                    i['Address'] = new_name
-                    save()
-                    return say
-                elif i['Address'] == None:
-                    i['Address'] = new_name
-                    save()
-                    return say
-                else:
-                    print(f'{old_name} not in Adress Book')
+    #     elif decision == 'birthday' or decision == 'ишкервфн' or decision == '3':
+    #         print('Type birthday you want to change. Expected day.month.year(Example:25.12.1970). If there is no birthday - just press "enter".')
+    #         if len(result) > 1:
+    #             print(f"I've found {len(result)} notes with this Name")
+    #             show_find(result)
+    #             print('Please enter Id to change birthday of proper name')
+    #             del_input = int(input())
+    #             for i in result:
+    #                 if i["Id"] == del_input:
+    #                     old_name = str(input())
+    #                     print(
+    #                         'Type new birthday. Expected day.month.year(Example:25.12.1970). If year of birth is not known, type 1111')
+    #                     new_name = str(input())
+    #                     try:
+    #                         new_name = datetime.strptime(
+    #                             new_name, "%d.%m.%Y").date()
+    #                     except:
+    #                         print(
+    #                             'Wrong input. Expected day.month.year(Example:25.12.1970)')
+    #                     for i in result:
+    #                         if i['Birthday'] == old_name:
+    #                             i['Birthday'] = new_name
+    #                             save()
+    #                             return say
+    #                         elif i['Birthday'] == None:
+    #                             i['Birthday'] = new_name
+    #                             save()
+    #                             return say
+    #                         else:
+    #                             print(f'{old_name} not in Adress Book')
+    #         elif len(result) == 1:
+    #             old_name = str(input())
+    #             print('Type new birthday. Expected day.month.year(Example:25.12.1970)')
+    #             new_name = str(input())
+    #             try:
+    #                 new_name = datetime.strptime(new_name, "%d.%m.%Y").date()
+    #             except:
+    #                 print('Wrong input. Expected day.month.year(Example:25.12.1970)')
+    #             for i in result:
+    #                 if i['Birthday'] == old_name:
+    #                     i['Birthday'] = new_name
+    #                     save()
+    #                     return say
+    #                 elif i['Birthday'] == None:
+    #                     i['Birthday'] = new_name
+    #                     save()
+    #                     return say
+    #                 else:
+    #                     print(f'{old_name} not in Adress Book')
 
-        elif decision == 'email' or decision == 'e-mail' or decision == 'уьфшд' or decision == '5':
-            print(
-                'Type E-mail you want to change. If there are no E-mail - just press "enter".')
-            old_name = str(input())
-            print('Type new E-mail.')
-            new_name = str(input())
-            for i in result:
-                if i['E-mail'] == old_name:
-                    i['E-mail'] = new_name
-                    save()
-                    return say
-                elif i['E-mail'] == None:
-                    i['E-mail'] = new_name
-                    save()
-                    return say
-                else:
-                    print(f'{old_name} not in Adress Book')
+    #     elif decision == 'address' or decision == 'adress' or decision == 'adres' or decision == 'фввкуіі' or decision == 'фвкуі' or decision == '4':
+    #         print(
+    #             'Type address you want to change. If there is no address - just press "enter".')
+    #         old_name = str(input())
+    #         print('Type new address.')
+    #         new_name = str(input())
+    #         for i in result:
+    #             if i['Address'] == old_name:
+    #                 i['Address'] = new_name
+    #                 save()
+    #                 return say
+    #             elif i['Address'] == None:
+    #                 i['Address'] = new_name
+    #                 save()
+    #                 return say
+    #             else:
+    #                 print(f'{old_name} not in Adress Book')
 
-        elif decision == 'tags' or decision == 'tag' or decision == 'ефп' or decision == '6':
-            print(
-                'Type Tags you want to change. If there are no Tags - just press "enter"')
-            old_name = str(input())
-            print('Type new Tags.')
-            new_name = str(input())
-            for i in result:
-                if i['Tags'] == old_name:
-                    i['Tags'] = new_name
-                    save()
-                    return say
-                elif i['Tags'] == None:
-                    i['Tags'] = new_name
-                    save()
-                    return say
-                else:
-                    print(f'{old_name} not in Adress Book')
+    #     elif decision == 'email' or decision == 'e-mail' or decision == 'уьфшд' or decision == '5':
+    #         print(
+    #             'Type E-mail you want to change. If there are no E-mail - just press "enter".')
+    #         old_name = str(input())
+    #         print('Type new E-mail.')
+    #         new_name = str(input())
+    #         for i in result:
+    #             if i['E-mail'] == old_name:
+    #                 i['E-mail'] = new_name
+    #                 save()
+    #                 return say
+    #             elif i['E-mail'] == None:
+    #                 i['E-mail'] = new_name
+    #                 save()
+    #                 return say
+    #             else:
+    #                 print(f'{old_name} not in Adress Book')
 
-        elif decision == 'exit' or decision == 'esc' or decision == 'close' or decision == 'учше' or decision == '7':
-            esc_e = False
-            return esc_e
+    #     elif decision == 'tags' or decision == 'tag' or decision == 'ефп' or decision == '6':
+    #         print(
+    #             'Type Tags you want to change. If there are no Tags - just press "enter"')
+    #         old_name = str(input())
+    #         print('Type new Tags.')
+    #         new_name = str(input())
+    #         for i in result:
+    #             if i['Tags'] == old_name:
+    #                 i['Tags'] = new_name
+    #                 save()
+    #                 return say
+    #             elif i['Tags'] == None:
+    #                 i['Tags'] = new_name
+    #                 save()
+    #                 return say
+    #             else:
+    #                 print(f'{old_name} not in Adress Book')
 
-    else:
-        print(f'{old_name} not in Adress Book')
+    #     elif decision == 'exit' or decision == 'esc' or decision == 'close' or decision == 'учше' or decision == '7':
+    #         view.esc_e = False
+    #         return view.esc_e
 
-
-def clear():
-    os.system('cls' if os.name == 'nt'else 'clear')
-
-# START CHaNGE
+    # else:
+    #     print(f'{old_name} not in Adress Book')
 
 
-@error_handler
+# def clear():
+#     os.system('cls' if os.name == 'nt'else 'clear')
+
+
+# @error_handler
 def clean_folder():
-
-    print(100*"_")
-    print('Welcome to clean folder instrument!')
-    print(100*"_")
-    print('Please enter path to clean and structurise.')
-    user_input = str(input())
-
+    user_input = view.enter_path_for_clean_lolder()
     path = pathlib.Path(user_input)
-    print_recursive(path, user_input)
-    delete_dir(user_input)
-    # D:\Tresh
-    return 'Everything done! Please check yor folder!'
+    CleanFolder().print_recursive(path, user_input)
+    CleanFolder().delete_dir(user_input)
+    view.notify_of_message('Everything done! Please check your folder!')
 
 
-@error_handler
+# @error_handler
 def birthday():
-    global esc_e
-    print(100*'_')
-    print("1.   If you want to find, who'll have birthday in exact date TYPE 1.\n2.   If you need to know who'll have birthday in period of time TYPE 2.\n3.   If you need to know how many days to somebody's birthday TYPE 3.\n4.   Type 'exit' to exit")
-    decision = int(input())
+
+    view.notify_of_message(100*'_')
+    decision = view.input_birthday_search_type()
     result = []
 
     if decision == 1:
-        print("Please write in how many days will be people's birthday.")
-        n = int(input())
+        n = view.input_for_birthday_1()
+        ##########хочу заменить#################
         if n >= 365:
             n = n % 365
 
@@ -491,10 +483,11 @@ def birthday():
         d = timedelta(days=n)
         bday = today_d+d
         bday = bday.strftime("%d.%m.%Y")
-        for i in book:
+        for i in model.book:
             if i["Birthday"] != 0 and i["Birthday"] != None:
-                if days_to_birthday(i["Birthday"]) == n:
+                if Birthday.days_to_birthday(i["Birthday"]) == n:
                     result.append(i)
+        ##########хочу заменить#################
         print(
             f'On {bday} you need to congratulate {len(result)} people from your Addressbook')
 
@@ -503,11 +496,13 @@ def birthday():
     elif decision == 2:
         print("Please write how many days in advance to warn you about people's birthday.")
         n = int(input())
-        for i in book:
+        for i in model.book:
             if i["Birthday"] != 0 and i["Birthday"] != None:
-                if days_to_birthday(i["Birthday"]) <= n:
+                print('I am in Birth start')
+                print(i["Birthday"])
+                if Birthday.days_to_birthday(i["Birthday"]) <= n:
                     result.append(i)
-
+                print('I am in Birth end')
         if len(result) > 0:
             print(
                 f'In future {n} days you need to congratulate {len(result)} people from your Addressbook')
@@ -519,7 +514,7 @@ def birthday():
     elif decision == 3:
         print("Please write name to know how many days left to birthday.")
         name = input()
-        result = book.find_value(name)
+        result = model.book.find_value(name)
         if len(result) > 1:
             print(f"I've found {len(result)} notes with this Name")
             show_find(result)
@@ -528,47 +523,34 @@ def birthday():
             id_input = int(input())
             for i in result:
                 if i["Id"] == id_input:
-                    days = days_to_birthday(i['Birthday'])
+                    days = Birthday.days_to_birthday(i['Birthday'])
                     print(
                         f'{i["Name"]} from your Addressbook will have birthday in {days} days. Do not forget to congratulate!')
 
         elif len(result) == 1:
             for i in result:
-                days = days_to_birthday(i['Birthday'])
+                days = Birthday.days_to_birthday(i['Birthday'])
                 print(
                     f'{i["Name"]} from your Addressbook will have birthday in {days} days. Do not forget to congratulate!')
         else:
             print(f'No information about birthday. Please enter valid information using command "change" or add new person to Addressbook')
 
     elif decision == 4 or decision == 'exit':
-        esc_e = False
+        view.esc_e = False
         return "Closed"
 
     else:
-        print('Not found this Name!')
+        view.notify_of_message('This Name is not found!')
+
+# @error_handler
 
 
-def days_to_birthday(bday):
-    today_d = datetime.now().date()
-    bday = datetime.strptime(bday, "%d.%m.%Y").date()
-    bday = date(today_d.year, bday.month, bday.day)
-
-    if today_d > bday:
-        bday = date(today_d.year+1, bday.month, bday.day)
-        days_left = (bday-today_d)
-    else:
-        days_left = (bday-today_d)
-
-    return days_left.days
-
-
-@error_handler
 def delete():
     print(100*'_')
     print('Put Name, you want to find and delete from your addressbook')
     find_v = str(input())
     find_v = find_v.lower()
-    result = book.find_value(find_v)
+    result = model.book.find_value(find_v)
     for i in result:
         if i["Name"].lower() != find_v:
             result.remove(i)
@@ -579,31 +561,29 @@ def delete():
         print('Please enter Id to delete the right note')
 
         del_input = int(input())
-        for i in book:
+        for i in model.book:
             if i["Name"].lower() == find_v and i["Id"] == del_input:
-                book.remove(i)
+                model.book.remove(i)
                 print(f"You've deleted {find_v}")
                 save()
 
     elif len(result) == 1:
         for i in result:
             if i["Name"].lower() == find_v:
-                book.remove(i)
+                model.book.remove(i)
                 print(f"You've deleted {find_v}")
                 save()
 
     else:
         print(f"{find_v} not found")
 
-# end
 
-
-@error_handler
+# @error_handler
 def find():
     print(100*'_')
     print('Put word, half of word or digits you want to find')
     find_v = str(input())
-    result = book.find_value(find_v)
+    result = model.book.find_value(find_v)
     show_find(result)
 
 
@@ -625,38 +605,27 @@ def show_find(v_list):
 
 
 def exit():
-    global esc_e
+
     save()
-    esc_e = False
-    return "Good Bye"
+    view.esc_e = False
+    view.say_buy()
 
 
 def save():
-    with open(path, 'wb') as fh:
-        model.save_books()
+    model.save_books()
 
 # @error_handler
 
 
 def show():
-    number = input('Please input the number or record on 1 page: ')
-    try:
-        number = int(number)
-    except:
-        number = 10
-    print("The contacts book is following:")
-    if number == 0 or number == None:
-        number = 10
-    iter = book.iterator1(number)
+    number = view.enter_number_of_page()
+    iter = model.book.iterator(number)
+
     for i in iter:
-        # Печать шапки с названием столбцов
-        print(145*'_')
-        print('| ID  |           Name           |     Phones      |  Birthday  |           Address            |              E-mail            |      Tags      |')
-        print(145*'-')
-        print(i)
-        print(63*'_'+'The end of the page. PRESS ENTER'+63*'_')
-        input()
-    return "The end of the contacts book"
+        view.show_one_page_of_addressbook(i)
+
+    view.notify_of_message("The end of the contacts book")
+
 ##############################################################
 # Команды для Handler для работы с NotesBook
 
@@ -711,7 +680,7 @@ def help_func():
     view.help()
 
 
-@error_handler
+# @ error_handler
 def handler(user_inpu):
     if user_inpu in COMMANDS.keys():
         # если ввод команды понятный:
@@ -721,13 +690,18 @@ def handler(user_inpu):
         for key, value in GUESS_COMMANDS.items():
             if user_inpu in key:
                 guess_command = value
-        if view.clarify_command(guess_command):
-            return COMMANDS[guess_command]()
-        else:
-            return view.notify_of_error()
+                if view.clarify_command(guess_command):
+                    return COMMANDS[guess_command]()
+        return view.notify_of_error()
 
 
-COMMANDS = {'add': add, 'ad': add, '+': add, 'фвв': add, 'change': change, 'срфтпу': change, 'close': exit, 'exit': exit, 'учше': exit, 'clear': clear, 'сдуфк': clear,
+YES_DECISION = {'y', 'yes', 'нуі', 'н', 'да', 'д'}
+
+NO_DECISION = {'n', 'not', 'no', 'нет', 'тщ', 'тще', 'т'}
+
+EXIT_DECISION = {'exit', 'учше', 'esc', 'close'}
+
+COMMANDS = {'add': add, 'ad': add, '+': add, 'фвв': add, 'change': change, 'срфтпу': change, 'close': exit, 'exit': exit, 'учше': exit,
             'find': find, 'аштв': find, 'help': help_func, 'рудз': help_func, 'хелп': help_func, 'save': save, 'іфму': save, 'ыфму': save, 'show': show, 'ырщц': show, 'ірщц': show,
             'delete': delete, 'del': delete, 'вуд': delete, 'вудуеу': delete, 'birthday': birthday, 'ишкервфн': birthday, 'clean': clean_folder, 'сдуфт': clean_folder,
             'add note': add_note, 'фвв тщеу': add_note, 'delete note': delete_note, 'вудуеу тщеу': delete_note, 'edit note': edit_note, 'увше тщеу': edit_note,
