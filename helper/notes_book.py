@@ -16,31 +16,11 @@ class NotesBook(UserList):
             if note[0] == hashtag:
                 self.remove(note)
 
-    def edit_note(self, hashtag):
+    def edit_note(self, new_note):
         # редактирует заметку из NotesBook, которая имеет заметка[0]==hashtag
-        # редактирование заметки происходит построчно
-        # помощник печатает строку для редактирование,
-        # далее пользователь вводит строку, на которую надо заменить напечатанную строку.
-        # Если пользователь ничего не ввел строка осталась без изменения
         for note in self:
-            if note[0] == hashtag:
-                # находим нужную заметку с заданным ключевым словом
-                # изменяем текст заметки, который находится в  note[1]
-                print('You would like to edit the following note:')
-                print(note[1])
-
-                lines = note[1].split('\n')
-                counter = 0
-                for line in lines:
-                    print('Please edit:')
-                    print(line)
-                    new_line = input()
-                    if new_line:
-                        lines.pop(counter)
-                        lines.insert(counter, new_line)
-                    counter += 1
-                note[1] = '\n'.join(lines)
-                print("The note is edited")
+            if note[0] == new_note[0]:
+                note[1] = new_note[1]
 
     def find_note(self, keyword):
         # находит все заметки, в тэгах которых содержится keyword

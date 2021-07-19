@@ -178,9 +178,28 @@ class ConsoleView(ViewInterface):
         print("Please input a hashtag of note that you would like to delete:")
         return input().upper()
 
-    def edit_note(self):
+    def input_hashtag_to_edit_notes(self):
         print("Please input a hashtag of note that you would like to edit:")
         return input().upper()
+
+    def edit_note(self, note):
+        # note - список: note[0] -хєштег, note[1] - текст заметки
+        # возвращает новую заметку
+        print('You would like to edit the following note:')
+        print(note[1])
+
+        lines = note[1].split('\n')
+        counter = 0
+        for line in lines:
+            print('Please edit:')
+            print(line)
+            new_line = input()
+            if new_line:
+                lines.pop(counter)
+                lines.insert(counter, new_line)
+            counter += 1
+        note[1] = '\n'.join(lines)
+        return note
 
     def find_note(self):
         print('Please input keyword for search:')
@@ -268,8 +287,8 @@ class ConsoleView(ViewInterface):
         print('Input Tags. Please no more than 15 symbols')
         return str(input())
 
-    def input_id(self):
-        print('Please enter Id of contact that you want to delete')
+    def input_id(self, message="Please enter Id of contact that you want to delete"):
+        print(message)
         return int(input())
 
     def input_birthday_search_type(self):
@@ -294,3 +313,13 @@ class ConsoleView(ViewInterface):
         for i in result:
             print(
                 f'{i[0]} from your Addressbook will have birthday in {i[1]} days. Do not forget to congratulate!')
+
+    def input_field_to_edit(self):
+        print('Please input:')
+        print('1 - to change Name')
+        print('2 - to change Phone')
+        print('3 - to change Birthday')
+        print('4 - to change Address')
+        print('5 - to change E-mail')
+        print('6 - to change Tags')
+        return int(input())

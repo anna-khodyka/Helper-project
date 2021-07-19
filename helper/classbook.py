@@ -111,17 +111,29 @@ class Birthday:
 class Record:
     def __init__(self, name, id_n, phones=None, birthday=None, address=None, email=None, tags=None):
         self.id_n = id_n
+        self.name = name
         self.phones = []
-        self.birthday = None  # хранится дата без времени в формате datetime
-        self.address = None
-        self.email = None
-        self.tags = None
-        self.user = {'Id': self.id_n, 'Name': name.name,
+        self.birthday = birthday  # хранится дата без времени в формате datetime
+        self.address = address
+        self.email = email
+        self.tags = tags
+        self.user = {'Id': self.id_n,
+                     'Name': self.name,
                      'Phones': self.phones,
                      'Birthday': self.birthday,
                      'Address': self.address,
                      'E-mail': self.email,
                      'Tags': self.tags}
+
+    def __str__(self) -> str:
+        result = ""
+        for i in self.user:
+            result += f'|{i["Id"]:<5}| {i["Name"]:<25}| { i["Phones"][0] if len(i["Phones"])>=1 else " ":<15} | {str(i["Birthday"]) if i["Birthday"] else " ":<11}|{i["Address"]if i["Address"] else " ":<30}|  {i["E-mail"]if i["E-mail"] else " ":<30}| {i["Tags"] if i["Tags"] else " ":<15}|\n'
+            if len(i["Phones"]) > 1:
+                for elem in i["Phones"][1:]:
+                    result += f'|     |                          | {elem: <15} |            |                              |                                |                | \n'
+            result += f"{145*'_'}\n"
+        return result
 
     def add_address(self, address):
         self.address = address

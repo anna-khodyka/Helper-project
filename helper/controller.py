@@ -67,8 +67,8 @@ GUESS_COMMANDS = {('a', 'ad', 'addd', 'asd', 'asdd', 'sdd', 'adf', 'фів', 'і
 class Controller:
 
     def __init__(self):
-        self.model = None
-        self.view = None
+        self.model = Model('')
+        self.view = ConsoleView()
 
     @error_handler
     def add(self):
@@ -218,219 +218,73 @@ class Controller:
 
     @error_handler
     def change(self):
-        pass
-        # для дальнейшего рефакторинга#####################
+        # определяем id контакта что надо изменить
+        self.view.notify_of_message(100*'_')
+        find_v = self.view.input_name(
+            message="Put Name, you want to change")
+        find_v = find_v.lower()
+        result = self.model.book.find_value(find_v)
 
-        # print(100*"_")
-        # say = 'Successfully changed'
-        # print('Type name of record you want to change')
-        # old_name = str(input())
-        # old_name = old_name.lower()
-        # result = self.model.book.find_value(old_name)
+        if len(result) == 1:
+            for i in result:
+                edited_id = i["Id"]
+        elif len(result) > 1:
+            # если найдены несколько результатов поиска
+            self.view.notify_of_message(
+                f"I've found {len(result)} notes with this Name")
+            self.show_find(result)
+            # ввод id для изменения
+            edited_id = self.view.input_id(
+                message='Please enter Id of contact that you want to change')
+        else:
+            self.view.notify_of_message(
+                f"The contact with name {find_v.upper()} is not found")
+            return None
+        # изменение контакта с определенным id = edited_id
+        for contact in self.model.book:
+            if contact['Id'] == edited_id:
+                self.view.notify_of_message(
+                    "You are editing the following contact:")
+                print(contact)
 
-        # if len(result) > 0 and len(result) != None:
-        #     show_find(result)
+                record = Record(contact['Name'], edited_id, contact['Phones'],
+                                contact['Birthday'], contact['Address'], contact['E-mail'], contact['Tags'])
+                record.user['Phones'] = contact['Phones']
 
-        #     print(100*"_")
-        #     print('1.   To change Name: type "name".\n2.   To change Phone: type "phone".\n3.   To change Birthday: type "birthday".\n4.   To change Address: type "address".\n5.   To change E-mail: type "email".\n6.   To change Tags: type "tags"\n7.   To exit: type "exit".\n')
-        #     decision = str(input())
-        #     decision = decision.lower()
+                fields = {1: 'Name', 2: 'Phones', 3: 'Birthday',
+                          4: 'Address', 5: 'E-mail', 6: 'Tags'}
 
-        #     if decision == 'name' or decision == 'тфьу' or decision == '1':
-        #         print('Type new name')
-        #         new_name = str(input())
+                inputing_command = {1: self.view.input_name,
+                                    2: self.view.input_phone,
+                                    3: self.view.input_birthday,
+                                    4: self.view.input_address,
+                                    5: self.view.input_email,
+                                    6: self.view.input_tags}
 
-        #         if len(result) > 1:
-        #             print(f"I've found {len(result)} notes with this Name")
-        #             show_find(result)
-        #             print('Please enter Id to change the right name')
+                changed_field = self.view.input_field_to_edit()
 
-        #             del_input = int(input())
-        #             for i in result:
-        #                 if i["Id"] == del_input:
-        #                     i['Name'] = new_name
-        #                     save()
-        #                     return say
+                field_value = inputing_command[changed_field]()
 
-        #         elif len(result) == 1:
-        #             for i in result:
-        #                 i['Name'] = new_name
-        #                 save()
-        #                 return say
+                if changed_field == 1:  # Name
+                    record.user[fields[changed_field]] = field_value
+                elif changed_field == 2:  # Phones
+                    record.phones = []
+                    record.add_phone(field_value)
+                elif changed_field == 3:  # Birthday
+                    record.add_birthday(field_value)
+                elif changed_field == 4:  # address
+                    record.add_address(field_value)
+                elif changed_field == 5:  # Email
+                    record.add_email(field_value)
+                elif changed_field == 6:  # Tag
+                    record.user[fields[changed_field]] = field_value
+                break
 
-        #         else:
-        #             print(f'{old_name} not in Adress Book')
-
-        #     elif decision == 'phone' or decision == 'зрщту' or decision == '2':
-        #         print(
-        #             'Type phone you want to change.If there are no phones - just press "enter".')
-
-        #         if len(result) > 1:
-        #             print(f"I've found {len(result)} notes with this Name")
-        #             show_find(result)
-        #             print('Please enter Id to change the phone of proper name')
-        #             del_input = int(input())
-        #             for i in result:
-        #                 if i["Id"] == del_input:
-        #                     old_name = str(input())
-        #                     print('Type new phone')
-        #                     new_name = str(input())
-        #                     for i in result:
-        #                         if len(i['Phones']) > 1:
-        #                             for j in i['Phones']:
-        #                                 if j == old_name:
-        #                                     i['Phones'].remove(j)
-        #                                     i['Phones'].append(new_name)
-        #                                     save()
-        #                                     return say
-        #                                 else:
-        #                                     print(f'{old_name} not in Adress Book')
-
-        #                         elif len(i['Phones']) == 1:
-        #                             i['Phones'].remove(old_name)
-        #                             i['Phones'].append(new_name)
-        #                             return say
-        #                         elif len(i['Phones']) == 0:
-        #                             i['Phones'].append(new_name)
-        #                             save()
-        #                             return say
-
-        #         elif len(result) == 1:
-        #             old_name = str(input())
-        #             print('Type new phone')
-        #             new_name = str(input())
-        #             for i in result:
-        #                 if len(i['Phones']) > 1:
-        #                     for j in i['Phones']:
-        #                         if j == old_name:
-        #                             i['Phones'].remove(j)
-        #                             i['Phones'].append(new_name)
-        #                             save()
-        #                             return say
-        #                     else:
-        #                         print(f'{old_name} not in Adress Book')
-
-        #                 elif len(i['Phones']) == 1:
-        #                     i['Phones'].remove(old_name)
-        #                     i['Phones'].append(new_name)
-        #                     return say
-        #                 elif len(i['Phones']) == 0:
-        #                     i['Phones'].append(new_name)
-        #                     save()
-        #                     return say
-        #         else:
-        #             print(f'{old_name} not in Adress Book')
-
-        #     elif decision == 'birthday' or decision == 'ишкервфн' or decision == '3':
-        #         print('Type birthday you want to change. Expected day.month.year(Example:25.12.1970). If there is no birthday - just press "enter".')
-        #         if len(result) > 1:
-        #             print(f"I've found {len(result)} notes with this Name")
-        #             show_find(result)
-        #             print('Please enter Id to change birthday of proper name')
-        #             del_input = int(input())
-        #             for i in result:
-        #                 if i["Id"] == del_input:
-        #                     old_name = str(input())
-        #                     print(
-        #                         'Type new birthday. Expected day.month.year(Example:25.12.1970). If year of birth is not known, type 1111')
-        #                     new_name = str(input())
-        #                     try:
-        #                         new_name = datetime.strptime(
-        #                             new_name, "%d.%m.%Y").date()
-        #                     except:
-        #                         print(
-        #                             'Wrong input. Expected day.month.year(Example:25.12.1970)')
-        #                     for i in result:
-        #                         if i['Birthday'] == old_name:
-        #                             i['Birthday'] = new_name
-        #                             save()
-        #                             return say
-        #                         elif i['Birthday'] == None:
-        #                             i['Birthday'] = new_name
-        #                             save()
-        #                             return say
-        #                         else:
-        #                             print(f'{old_name} not in Adress Book')
-        #         elif len(result) == 1:
-        #             old_name = str(input())
-        #             print('Type new birthday. Expected day.month.year(Example:25.12.1970)')
-        #             new_name = str(input())
-        #             try:
-        #                 new_name = datetime.strptime(new_name, "%d.%m.%Y").date()
-        #             except:
-        #                 print('Wrong input. Expected day.month.year(Example:25.12.1970)')
-        #             for i in result:
-        #                 if i['Birthday'] == old_name:
-        #                     i['Birthday'] = new_name
-        #                     save()
-        #                     return say
-        #                 elif i['Birthday'] == None:
-        #                     i['Birthday'] = new_name
-        #                     save()
-        #                     return say
-        #                 else:
-        #                     print(f'{old_name} not in Adress Book')
-
-        #     elif decision == 'address' or decision == 'adress' or decision == 'adres' or decision == 'фввкуіі' or decision == 'фвкуі' or decision == '4':
-        #         print(
-        #             'Type address you want to change. If there is no address - just press "enter".')
-        #         old_name = str(input())
-        #         print('Type new address.')
-        #         new_name = str(input())
-        #         for i in result:
-        #             if i['Address'] == old_name:
-        #                 i['Address'] = new_name
-        #                 save()
-        #                 return say
-        #             elif i['Address'] == None:
-        #                 i['Address'] = new_name
-        #                 save()
-        #                 return say
-        #             else:
-        #                 print(f'{old_name} not in Adress Book')
-
-        #     elif decision == 'email' or decision == 'e-mail' or decision == 'уьфшд' or decision == '5':
-        #         print(
-        #             'Type E-mail you want to change. If there are no E-mail - just press "enter".')
-        #         old_name = str(input())
-        #         print('Type new E-mail.')
-        #         new_name = str(input())
-        #         for i in result:
-        #             if i['E-mail'] == old_name:
-        #                 i['E-mail'] = new_name
-        #                 save()
-        #                 return say
-        #             elif i['E-mail'] == None:
-        #                 i['E-mail'] = new_name
-        #                 save()
-        #                 return say
-        #             else:
-        #                 print(f'{old_name} not in Adress Book')
-
-        #     elif decision == 'tags' or decision == 'tag' or decision == 'ефп' or decision == '6':
-        #         print(
-        #             'Type Tags you want to change. If there are no Tags - just press "enter"')
-        #         old_name = str(input())
-        #         print('Type new Tags.')
-        #         new_name = str(input())
-        #         for i in result:
-        #             if i['Tags'] == old_name:
-        #                 i['Tags'] = new_name
-        #                 save()
-        #                 return say
-        #             elif i['Tags'] == None:
-        #                 i['Tags'] = new_name
-        #                 save()
-        #                 return say
-        #             else:
-        #                 print(f'{old_name} not in Adress Book')
-
-        #     elif decision == 'exit' or decision == 'esc' or decision == 'close' or decision == 'учше' or decision == '7':
-        #         self.view.esc_e = False
-        #         return self.view.esc_e
-
-        # else:
-        #     print(f'{old_name} not in Adress Book')
+        # удаление изменяемого контакта
+        self.model.book.remove(contact)
+        # добавление обновленного контакта
+        self.model.book.add_record(record.user)
+        self.save()
 
     @error_handler
     def clean_folder(self):
@@ -575,8 +429,15 @@ class Controller:
 
     @error_handler
     def edit_note(self):
-        hashtag = self.view.edit_note()
-        self.model.notes_book.edit_note(hashtag)
+        hashtag = self.view.input_hashtag_to_edit_notes()
+        for note in self.model.notes_book:
+            if note[0] == hashtag:
+                # находим нужную заметку с заданным ключевым словом
+                # и изменяем текст заметки
+                new_note = self.view.edit_note(note)
+                self.model.notes_book.edit_note(new_note)
+                self.view.notify_of_message(
+                    f'The note with tag {new_note[0].upper()} is edited')
 
     @error_handler
     def find_note(self):
