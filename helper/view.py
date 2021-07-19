@@ -1,17 +1,100 @@
 
 class ViewInterface:
-    def greeting(self):
-        raise NotImplementedError('Greeting func is not implemented')
+    def greete(self):
+        raise NotImplementedError
 
     def register_or_authorize(self):
-        raise NotImplementedError(
-            'register_or_authorize func is not implemented')
+        raise NotImplementedError
 
     def register(self):
-        raise NotImplementedError('register func is not implemented')
+        raise NotImplementedError
 
     def authorize(self):
-        raise NotImplementedError('authorize func is not implemented')
+        raise NotImplementedError
+
+    def choose_command(self):
+        raise NotImplementedError
+
+    def say_buy(self):
+        raise NotImplementedError
+
+    def notify_of_error(self):
+        raise NotImplementedError
+
+    def notify_of_message(self, message):
+        raise NotImplementedError
+
+    def add_note(self):
+        raise NotImplementedError
+
+    def help(self):
+        raise NotImplementedError
+
+    def delete_note(self):
+        raise NotImplementedError
+
+    def edit_note(self):
+        raise NotImplementedError
+
+    def find_note(self):
+        raise NotImplementedError
+
+    def print_notes_book(self, notesbook):
+        raise NotImplementedError
+
+    def sort_notes(self):
+        raise NotImplementedError
+
+    def clarify_command(self, guess_command):
+        raise NotImplementedError
+
+    def enter_number_of_page(self):
+        raise NotImplementedError
+
+    def show_one_page_of_addressbook(self, i):
+        raise NotImplementedError
+
+    def enter_path_for_clean_lolder(self):
+        raise NotImplementedError
+
+    def ask_to_add_field(self, field_name):
+        raise NotImplementedError
+
+    def input_name(self, message='Input Name:'):
+        raise NotImplementedError
+
+    def input_phone(self):
+        raise NotImplementedError
+
+    def input_birthday(self):
+        raise NotImplementedError
+
+    def input_address(self):
+        raise NotImplementedError
+
+    def input_email(self):
+        raise NotImplementedError
+
+    def input_tags(self):
+        raise NotImplementedError
+
+    def input_id(self):
+        raise NotImplementedError
+
+    def input_birthday_search_type(self):
+        raise NotImplementedError
+
+    def input_for_birthday_1(self):
+        raise NotImplementedError
+
+    def input_for_birthday_2(self):
+        raise NotImplementedError
+
+    def input_for_birthday_3(self):
+        raise NotImplementedError
+
+    def print_persons_and_their_birthday(self, result):
+        raise NotImplementedError
 
 
 class ConsoleView(ViewInterface):
@@ -153,7 +236,6 @@ class ConsoleView(ViewInterface):
         print(100*"_")
         print('Please enter path to clean and structurise.')
         return str(input())
-    ##########Функции for Controller - Add #################
 
     def ask_to_add_field(self, field_name):
         print(

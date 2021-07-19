@@ -4,19 +4,6 @@ from collections import UserList
 from datetime import datetime, timedelta, date
 
 
-class Field:
-    def __init__(self, value):
-        self.__value = value
-
-    @property
-    def value(self):
-        return self.__value
-
-    @value.setter
-    def value(self, new_value):
-        self.__value = new_value
-
-
 class AddressBook(UserList):
 
     data = []
@@ -105,45 +92,19 @@ class AddressBook(UserList):
         return result
 
 
-class Address(Field):
-    def __init__(self, address):
-        self.address = address
-
-
-class Tags(Field):
-    def __init__(self, tags):
-        self.tags = tags
-
-
-class Id(Field):
-    def __init__(self, id_n):
-        self.id_n = id_n
-
-
-class Email(Field):
-    def __init__(self, email):
-        self.email = email
-
-
-class Birthday(Field):
+class Birthday:
     def __init__(self, value):
         self.birthday = value
 
     @staticmethod
     def days_to_birthday(bday):
-        print('I am in days_to_birthday function')
         today_d = datetime.now().date()
-        print(f'today_d {today_d}')
-        # bday = datetime.strptime(bday, "%d.%m.%Y").date()
-        # bday = date(today_d.year, bday.month, bday.day)
         bday = bday.replace(year=today_d.year)
-
         if today_d > bday:
             bday = date(today_d.year+1, bday.month, bday.day)
             days_left = (bday-today_d)
         else:
             days_left = (bday-today_d)
-        print(f'days_left {days_left}')
         return days_left.days
 
 
@@ -215,31 +176,3 @@ class Record:
             return True
         except:
             return False
-
-
-class Name(Field):
-    def __init__(self, name):
-        self.name = name
-
-
-class Phone(Field):
-    def __init__(self, phone):
-        phones = []
-        self.phones = list()
-        self.__phone = phone
-
-    @ property
-    def phone(self):
-        return self.__phone
-
-    @ phone.setter
-    def phone(self, value):
-        self.__phone = ''
-        if re.fullmatch('[+]?[0-9]{3,12}', value):
-            self.__phone = value
-        else:
-            print(
-                'Phone must start with + and have 12 digits. Example +380501234567')
-
-    def __repr__(self):
-        return self.phone

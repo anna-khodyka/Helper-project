@@ -7,30 +7,15 @@ from datetime import datetime, timedelta, date
 
 # from .classbook import *
 # from .clean import *
+# from .model import *
 # from .view import *
 # from .notes_book import NotesBook
 
 from classbook import *
 from clean import *
+from model import *
 from notes_book import NotesBook
 from view import *
-
-
-class Model:
-    def __init__(self, path):
-        self.book = AddressBook()
-        self.notes_book = NotesBook()
-        self.path = path
-
-    def load_books(self):
-        with open(self.path, 'rb') as fh:
-            self.book = pickle.load(fh)
-            self.notes_book = pickle.load(fh)
-
-    def save_books(self):
-        with open(self.path, 'wb') as fh:
-            pickle.dump(self.book, fh)
-            pickle.dump(self.notes_book, fh)
 
 
 def error_handler(func):
@@ -92,7 +77,7 @@ def main():  # main относится к контроллеру!
 def add():
     # Ввод имени
     view.notify_of_message(100*'_')
-    name = Name(view.input_name())
+    name = view.input_name()
     if name in EXIT_DECISION:
         view.esc_e = False
         view.notify_of_message("Not saved")
