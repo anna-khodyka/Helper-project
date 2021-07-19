@@ -76,6 +76,7 @@ def main():  # main относится к контроллеру!
         else:
             view.notify_of_error()
 
+    # выполнение основных комманд HELPER-a
     while view.esc_e:
         user_inpu = view.choose_command()
         result = handler(user_inpu)
@@ -134,8 +135,7 @@ def add():
 
             birthday = view.input_birthday()
             if record1.validate_birthday(birthday):
-                record1.add_birthday(datetime.strptime(
-                    birthday, "%d.%m.%Y").date())
+                record1.add_birthday(birthday)
                 break
             else:
                 view.notify_of_message(
@@ -475,34 +475,17 @@ def birthday():
 
     if decision == 1:
         n = view.input_for_birthday_1()
-        ##########хочу заменить#################
-        if n >= 365:
-            n = n % 365
-
-        today_d = datetime.now().date()
-        d = timedelta(days=n)
-        bday = today_d+d
-        bday = bday.strftime("%d.%m.%Y")
-        for i in model.book:
-            if i["Birthday"] != 0 and i["Birthday"] != None:
-                if Birthday.days_to_birthday(i["Birthday"]) == n:
-                    result.append(i)
-        ##########хочу заменить#################
-        print(
-            f'On {bday} you need to congratulate {len(result)} people from your Addressbook')
-
-        show_find(result)
+        bday, result = model.book.find_persons_with_birthday_in_n_days(n)
+        if result:
+            view.notify_of_message(
+                f'On {bday} you need to congratulate {len(result)} people from your Addressbook')
+            show_find(result)
+        else:
+            view.notify_of_message(f'You need to congratulate noone on {bday}')
 
     elif decision == 2:
-        print("Please write how many days in advance to warn you about people's birthday.")
-        n = int(input())
-        for i in model.book:
-            if i["Birthday"] != 0 and i["Birthday"] != None:
-                print('I am in Birth start')
-                print(i["Birthday"])
-                if Birthday.days_to_birthday(i["Birthday"]) <= n:
-                    result.append(i)
-                print('I am in Birth end')
+        n = view.input_for_birthday_2()
+        result = model.book.find_persons_with_birthday_during_n_days(n)
         if len(result) > 0:
             print(
                 f'In future {n} days you need to congratulate {len(result)} people from your Addressbook')
@@ -512,32 +495,17 @@ def birthday():
                 f'In future {n} days nobody from your Addressbook will have birthday')
 
     elif decision == 3:
-        print("Please write name to know how many days left to birthday.")
-        name = input()
-        result = model.book.find_value(name)
-        if len(result) > 1:
-            print(f"I've found {len(result)} notes with this Name")
-            show_find(result)
-            print(
-                'Please enter Id to know how many days left to birthday the exact person')
-            id_input = int(input())
-            for i in result:
-                if i["Id"] == id_input:
-                    days = Birthday.days_to_birthday(i['Birthday'])
-                    print(
-                        f'{i["Name"]} from your Addressbook will have birthday in {days} days. Do not forget to congratulate!')
-
-        elif len(result) == 1:
-            for i in result:
-                days = Birthday.days_to_birthday(i['Birthday'])
-                print(
-                    f'{i["Name"]} from your Addressbook will have birthday in {days} days. Do not forget to congratulate!')
+        name = view.input_for_birthday_3()
+        result = model.book.find_persons_birthday(name)
+        if result:
+            view.print_persons_and_their_birthday(result)
         else:
-            print(f'No information about birthday. Please enter valid information using command "change" or add new person to Addressbook')
+            view.notify_of_message(
+                'No information about birthday. Please enter valid information using command "change" or add new person to Addressbook')
 
-    elif decision == 4 or decision == 'exit':
+    elif decision == 4 or decision in EXIT_DECISION:
         view.esc_e = False
-        return "Closed"
+        view.say_buy()
 
     else:
         view.notify_of_message('This Name is not found!')
@@ -546,67 +514,56 @@ def birthday():
 
 
 def delete():
-    print(100*'_')
-    print('Put Name, you want to find and delete from your addressbook')
-    find_v = str(input())
+    view.notify_of_message(100*'_')
+    find_v = view.input_name(
+        message="Put Name, you want to find and delete from your addressbook")
     find_v = find_v.lower()
     result = model.book.find_value(find_v)
-    for i in result:
-        if i["Name"].lower() != find_v:
-            result.remove(i)
 
-    if len(result) > 1:
-        print(f"I've found {len(result)} notes with this Name")
-        show_find(result)
-        print('Please enter Id to delete the right note')
-
-        del_input = int(input())
-        for i in model.book:
-            if i["Name"].lower() == find_v and i["Id"] == del_input:
-                model.book.remove(i)
-                print(f"You've deleted {find_v}")
-                save()
-
-    elif len(result) == 1:
+    if len(result) == 1:
         for i in result:
             if i["Name"].lower() == find_v:
                 model.book.remove(i)
-                print(f"You've deleted {find_v}")
+                view.notify_of_message(f"You've deleted {find_v}")
                 save()
-
+    elif len(result) > 1:
+        # если найдены несколько результатов поиска
+        view.notify_of_message(
+            f"I've found {len(result)} notes with this Name")
+        show_find(result)
+        # ввод id для удаления
+        del_input = view.input_id()
+        # удаление
+        for i in model.book:
+            if i["Id"] == del_input:
+                model.book.remove(i)
+                view.notify_of_message(f"You've deleted {find_v.upper()}")
+                model.save_books()
     else:
-        print(f"{find_v} not found")
+        view.notify_of_message(
+            f"The contact with name {find_v.upper()} is not found")
 
 
 # @error_handler
 def find():
-    print(100*'_')
-    print('Put word, half of word or digits you want to find')
-    find_v = str(input())
+    view.notify_of_message(100*'_')
+    find_v = view.input_name(
+        message="Put word, half of word or digits you want to find")
     result = model.book.find_value(find_v)
+    view.notify_of_message("I've found following:")
     show_find(result)
 
 
-def show_find(v_list):
-
-    print("I've found following:")
-    # Печать шапки с названием столбцов
-    print(145*'_')
-    print('| ID  |           Name           |     Phones      |  Birthday  |           Address            |              E-mail            |       Tags     |')
-    print(145*'-')
-
-    for i in v_list:
-        print(f'|{i["Id"]:<5}| {i["Name"]:<25}| { i["Phones"][0] if len(i["Phones"])>=1 else " ":<15} | {i["Birthday"]if i["Birthday"] else " ":<11}|{i["Address"]if i["Address"] else " ":<30}|  {i["E-mail"]if i["E-mail"] else " ":<30}| {i["Tags"] if i["Tags"] else " ":<15}|')
-        if len(i["Phones"]) > 1:
-            for elem in i["Phones"][1:]:
-                print(
-                    f'|     |                          | {elem: <15} |            |                              |                                |                |')
-        print(f"{145*'_'}")
+def show_find(result):
+    # выводит результаты поиска по объекту класса AdressBook
+    number = len(result)
+    iter = result.iterator(number)
+    for i in iter:
+        view.show_one_page_of_addressbook(i)
 
 
 def exit():
-
-    save()
+    model.save_books()
     view.esc_e = False
     view.say_buy()
 

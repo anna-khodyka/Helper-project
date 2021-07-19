@@ -162,8 +162,8 @@ class ConsoleView(ViewInterface):
         decision = decision.lower()
         return decision
 
-    def input_name(self):
-        print('Input Name:')
+    def input_name(self, message='Input Name:'):
+        print(message)
         return str(input())
 
     def input_phone(self):
@@ -186,6 +186,10 @@ class ConsoleView(ViewInterface):
         print('Input Tags. Please no more than 15 symbols')
         return str(input())
 
+    def input_id(self):
+        print('Please enter Id of contact that you want to delete')
+        return int(input())
+
     def input_birthday_search_type(self):
         print("1.   If you want to find, who'll have birthday in exact date TYPE 1.\n2.   If you need to know who'll have birthday in period of time TYPE 2.\n3.   If you need to know how many days to somebody's birthday TYPE 3.\n4.   Type 'exit' to exit")
         return int(input())
@@ -193,3 +197,18 @@ class ConsoleView(ViewInterface):
     def input_for_birthday_1(self):
         print("Please write in how many days will be people's birthday.")
         return int(input())
+
+    def input_for_birthday_2(self):
+        print("Please write how many days in advance to warn you about people's birthday.")
+        return int(input())
+
+    def input_for_birthday_3(self):
+        print("Please write name to know how many days left to birthday.")
+        return input()
+
+    def print_persons_and_their_birthday(self, result):
+        # result - список кортежей (имя, дней до ДР)
+        print(f"I've found {len(result)} notes with this Name:")
+        for i in result:
+            print(
+                f'{i[0]} from your Addressbook will have birthday in {i[1]} days. Do not forget to congratulate!')

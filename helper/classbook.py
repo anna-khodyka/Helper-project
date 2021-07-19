@@ -26,30 +26,31 @@ class AddressBook(UserList):
 
     def find_value(self, f_value):
         f_value = f_value.lower()
+        result = AddressBook()
 
-        result = []
-        for i in self:
-            for value in i.values():
+        for record_user in self:
+            for value in record_user.values():
                 if (isinstance(value, str)):
                     value = value.lower()
                     if value.find(f_value) != -1:
-                        if i not in result:
-                            result.append(i)
+                        if record_user not in result:
+                            result.append(record_user)
                             break
                 elif value != None:
                     if (isinstance(value, list)):
                         for j in value:
                             j = j.lower()
                             if j.find(f_value) != -1:
-                                result.append(i)
+                                result.append(record_user)
                                 break
         return result
 
     def iterator(self, n):
+        # возвращает текстовое представление объекта для консольного интерфейса
         counter = 0
         result = ""
         for i in self:
-            result += f'|{i["Id"]:<5}| {i["Name"]:<25}| { i["Phones"][0] if len(i["Phones"])>=1 else " ":<15} | {i["Birthday"]if i["Birthday"] else " ":<11}|{i["Address"]if i["Address"] else " ":<30}|  {i["E-mail"]if i["E-mail"] else " ":<30}| {i["Tags"] if i["Tags"] else " ":<15}|\n'
+            result += f'|{i["Id"]:<5}| {i["Name"]:<25}| { i["Phones"][0] if len(i["Phones"])>=1 else " ":<15} | {str(i["Birthday"]) if i["Birthday"] else " ":<11}|{i["Address"]if i["Address"] else " ":<30}|  {i["E-mail"]if i["E-mail"] else " ":<30}| {i["Tags"] if i["Tags"] else " ":<15}|\n'
             if len(i["Phones"]) > 1:
                 for elem in i["Phones"][1:]:
                     result += f'|     |                          | {elem: <15} |            |                              |                                |                | \n'
@@ -65,7 +66,9 @@ class AddressBook(UserList):
             result = result.rstrip("\n")
             yield result
 
-    def find_persons_with_birthday_in_n_days(self, n, book):
+    def find_persons_with_birthday_in_n_days(self, n):
+        # ищет людей с др в data
+        # возвращает объект AdressBook
 
         if n >= 365:
             n = n % 365
@@ -75,12 +78,31 @@ class AddressBook(UserList):
         today_d = datetime.now().date()
         d = timedelta(days=n)
         bday = today_d+d
-        bday = bday.strftime("%d.%m.%Y")
-        for i in book:
-            if i["Birthday"] != 0 and i["Birthday"] != None:
-                if Birthday.days_to_birthday(i["Birthday"]) == n:
-                    birthday_book.append(i)
+        for record_user in self.data:
+            if record_user["Birthday"] != 0 and record_user["Birthday"] != None:
+                if Birthday.days_to_birthday(record_user["Birthday"]) == n:
+                    birthday_book.append(record_user)
         return bday, birthday_book
+
+    def find_persons_with_birthday_during_n_days(self, n):
+        birthday_book = AddressBook()
+        for record_user in self.data:
+            if record_user["Birthday"] != 0 and record_user["Birthday"] != None:
+                if Birthday.days_to_birthday(record_user["Birthday"]) <= n:
+                    birthday_book.append(record_user)
+        return birthday_book
+
+    def find_persons_birthday(self, name):
+        # возвращает список кортежей (имя, дней до ДР)
+        birthday_book = self.find_value(name)
+        result = []
+        for record_user in birthday_book.data:
+            if record_user['Birthday']:
+                name = record_user['Name']
+                days = Birthday.days_to_birthday(record_user['Birthday'])
+                result.append((name, days))
+        print(result)
+        return result
 
 
 class Address(Field):
@@ -105,19 +127,7 @@ class Email(Field):
 
 class Birthday(Field):
     def __init__(self, value):
-        # self.__birthday = None
         self.birthday = value
-
-    # @property
-    # def birthday(self):
-    #     return self.__birthday.strftime('%d.%m.%Y')
-
-    # @birthday.setter
-    # def birthday(self, birthday):
-    #     try:
-    #         self.__birthday = datetime.strptime(birthday, '%d.%m.%Y')
-    #     except Exception:
-    #         print("Incorrect format, expected day.month.year (Example:25.12.1970)")
 
     @staticmethod
     def days_to_birthday(bday):
@@ -125,7 +135,8 @@ class Birthday(Field):
         today_d = datetime.now().date()
         print(f'today_d {today_d}')
         # bday = datetime.strptime(bday, "%d.%m.%Y").date()
-        bday = date(today_d.year, bday.month, bday.day)
+        # bday = date(today_d.year, bday.month, bday.day)
+        bday = bday.replace(year=today_d.year)
 
         if today_d > bday:
             bday = date(today_d.year+1, bday.month, bday.day)
@@ -140,7 +151,7 @@ class Record:
     def __init__(self, name, id_n, phones=None, birthday=None, address=None, email=None, tags=None):
         self.id_n = id_n
         self.phones = []
-        self.birthday = None
+        self.birthday = None  # хранится дата без времени в формате datetime
         self.address = None
         self.email = None
         self.tags = None
@@ -155,7 +166,9 @@ class Record:
         self.address = address
 
     def add_birthday(self, birthday):
-        self.bithday = birthday
+        self.birthday = datetime.strptime(
+            birthday, "%d.%m.%Y").date()
+        self.user['Birthday'] = self.birthday
 
     def add_email(self, email):
         self.email = email
