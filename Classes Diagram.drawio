@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2021-07-20T11:39:38.493Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" etag="0Y692yqN1nZzWC-KSmOi" version="14.9.0" type="github" pages="2">
+<mxfile host="app.diagrams.net" modified="2021-07-20T11:45:20.254Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" etag="oqXK2E8aFZF749Aahi3F" version="14.9.0" type="github" pages="2">
   <diagram id="C5RBs43oDa-KdzZeNtuy" name="Initial">
     <mxGraphModel dx="1038" dy="579" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -396,7 +396,7 @@
           <mxGeometry y="78" width="250" height="100" as="geometry" />
         </mxCell>
         <mxCell id="lIdF2me7N01zFQDFPlch-22" value="ConsoleView" style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;" vertex="1" parent="JwuOXEnyRKSzRNoaYuyo-1">
-          <mxGeometry x="880" y="407" width="250" height="430" as="geometry">
+          <mxGeometry x="880" y="407" width="250" height="580" as="geometry">
             <mxRectangle x="550" y="140" width="160" height="26" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
@@ -406,8 +406,22 @@
         <mxCell id="lIdF2me7N01zFQDFPlch-24" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="lIdF2me7N01zFQDFPlch-22">
           <mxGeometry y="70" width="250" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="lIdF2me7N01zFQDFPlch-25" value="greete&#xa;register_or_authorize&#xa;register&#xa;authorize&#xa;choose_command&#xa;say_buy&#xa;notify_of_error&#xa;notify_of_message&#xa;add_note&#xa;help&#xa;delete_note&#xa;input_hashtag_to_edit_note&#xa;edite_note&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="lIdF2me7N01zFQDFPlch-22">
-          <mxGeometry y="78" width="250" height="352" as="geometry" />
+        <mxCell id="lIdF2me7N01zFQDFPlch-25" value="greete&#xa;register_or_authorize&#xa;register&#xa;authorize&#xa;choose_command&#xa;say_buy&#xa;notify_of_error&#xa;notify_of_message&#xa;add_note&#xa;help&#xa;delete_note&#xa;input_hashtag_to_edit_note&#xa;edite_note&#xa;find_note&#xa;print_notes_book&#xa;sort_notes&#xa;clarify_command&#xa;enter_number_of_pages&#xa;show_one_page_of_addressbook&#xa;enter_path_for_clean_folder&#xa;ask_to_add_field&#xa;input_name&#xa;input_email&#xa;input_phone&#xa;input_birthday&#xa;input_address&#xa;input_tags&#xa;input_id&#xa;input_birthday_search_type&#xa;input_for_birthday_1&#xa;input_for_birthday_2&#xa;input_for_virthday_3&#xa;print_persins_and_their_birthday&#xa;input_field_to_edit&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="lIdF2me7N01zFQDFPlch-22">
+          <mxGeometry y="78" width="250" height="502" as="geometry" />
+        </mxCell>
+        <mxCell id="lIdF2me7N01zFQDFPlch-26" value="ViewInterface" style="swimlane;fontStyle=2;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;" vertex="1" parent="JwuOXEnyRKSzRNoaYuyo-1">
+          <mxGeometry x="1160" y="410" width="270" height="580" as="geometry">
+            <mxRectangle x="550" y="140" width="160" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lIdF2me7N01zFQDFPlch-28" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="lIdF2me7N01zFQDFPlch-26">
+          <mxGeometry y="26" width="270" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="lIdF2me7N01zFQDFPlch-29" value="greete&#xa;register_or_authorize&#xa;register&#xa;authorize&#xa;choose_command&#xa;say_buy&#xa;notify_of_error&#xa;notify_of_message&#xa;add_note&#xa;help&#xa;delete_note&#xa;input_hashtag_to_edit_note&#xa;edite_note&#xa;find_note&#xa;print_notes_book&#xa;sort_notes&#xa;clarify_command&#xa;enter_number_of_pages&#xa;show_one_page_of_addressbook&#xa;enter_path_for_clean_folder&#xa;ask_to_add_field&#xa;input_name&#xa;input_email&#xa;input_phone&#xa;input_birthday&#xa;input_address&#xa;input_tags&#xa;input_id&#xa;input_birthday_search_type&#xa;input_for_birthday_1&#xa;input_for_birthday_2&#xa;input_for_virthday_3&#xa;print_persins_and_their_birthday&#xa;input_field_to_edit&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="lIdF2me7N01zFQDFPlch-26">
+          <mxGeometry y="34" width="270" height="502" as="geometry" />
+        </mxCell>
+        <mxCell id="lIdF2me7N01zFQDFPlch-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.997;entryY=0.418;entryDx=0;entryDy=0;entryPerimeter=0;endArrow=block;endFill=0;" edge="1" parent="JwuOXEnyRKSzRNoaYuyo-1" source="lIdF2me7N01zFQDFPlch-29" target="lIdF2me7N01zFQDFPlch-25">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
