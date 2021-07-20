@@ -101,10 +101,12 @@ class ConsoleView(ViewInterface):
     def __init__(self):
         super().__init__()
         self.esc_e = True
+        # esc_e = True - приложение работает,
+        # esc_e = False - приложение завершает работу
 
     def greete(self):
         print(100*'_')
-        print('Hello! What do you want to do?')
+        print('Hello! How can I help you?')
 
     def register_or_authorize(self):
         # возвращает команду load / new / exit
