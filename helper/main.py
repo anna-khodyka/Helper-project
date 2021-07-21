@@ -8,6 +8,7 @@ from datetime import datetime, timedelta, date
 # from .classbook import *
 # from .clean import *
 # from .controller import *
+#from .error_handler import error_handler
 # from .model import *
 # from .view import *
 # from .notes_book import NotesBook
@@ -15,19 +16,10 @@ from datetime import datetime, timedelta, date
 from classbook import *
 from clean import *
 from controller import *
+from error_handler import error_handler
 from model import *
 from notes_book import NotesBook
 from view import *
-
-
-def error_handler(func):
-    def inner(*args):
-        try:
-            return func(*args)
-        except:
-            print(
-                'Wrong input! Type exact command you want to do,"exit" to exit or "help" for list of commands.')
-    return inner
 
 
 @error_handler
