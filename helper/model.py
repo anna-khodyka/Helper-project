@@ -1,11 +1,11 @@
 import pathlib
 import pickle
 
-# from .classbook import *
-# from .notes_book import NotesBook
+from .classbook import *
+from .notes_book import NotesBook
 
-from classbook import *
-from notes_book import NotesBook
+# from classbook import *
+# from notes_book import NotesBook
 
 
 class Model:

@@ -5,21 +5,21 @@ import re
 import os
 from datetime import datetime, timedelta, date
 
-# from .classbook import *
-# from .clean import *
-# from .controller import *
-#from .error_handler import error_handler
-# from .model import *
-# from .view import *
-# from .notes_book import NotesBook
+from .classbook import *
+from .clean import *
+from .controller import *
+from .error_handler import error_handler
+from .model import *
+from .view import *
+from .notes_book import NotesBook
 
-from classbook import *
-from clean import *
-from controller import *
-from error_handler import error_handler
-from model import *
-from notes_book import NotesBook
-from view import *
+# from classbook import *
+# from clean import *
+# from controller import *
+# from error_handler import error_handler
+# from model import *
+# from notes_book import NotesBook
+# from view import *
 
 
 @error_handler
