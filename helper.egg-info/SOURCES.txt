@@ -3,8 +3,12 @@ setup.py
 helper/__init__.py
 helper/classbook.py
 helper/clean.py
+helper/controller.py
+helper/error_handler.py
 helper/main.py
+helper/model.py
 helper/notes_book.py
+helper/view.py
 helper.egg-info/PKG-INFO
 helper.egg-info/SOURCES.txt
 helper.egg-info/dependency_links.txt
