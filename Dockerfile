@@ -4,11 +4,11 @@ WORKDIR /app
 
 RUN pip install pipenv
 
-COPY Pipfile Pipfile
-COPY Pipfile.lock Pipfile.lock
+COPY Pipfile /app/Pipfile
+COPY Pipfile.lock /app/Pipfile.lock
 
 RUN pipenv install --system --deploy
 
-COPY helper helper
+COPY helper /app/helper
 
-CMD python helper/main.py
+CMD python /app/helper/main.py
